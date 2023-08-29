@@ -31,10 +31,12 @@ Code を簡単にdeployできる様をみよう。（開発の部分はやらな
 
 上の中から、好きなweb appのframeworkを選択し、QuickStartのページに飛んでおこう。
 #### 要件
+たとえば、Team1で、djangoを選択したなら
 | Web App name | Resource Group Name | Tag to resource group |
 |--------------|---------------------|-----------------------|
 | Team1-webapp | Team1-webapp-rg     | "framework"="django"  |
 
+他の部分は、リンク先のtutorialに従う。
 #### 注意
 **Run the application locally ローカルでアプリを試す**　という項は、python を選ばないとできないはず。飛ばして良い。
 
