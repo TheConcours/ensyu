@@ -6,7 +6,8 @@
     }
 </style>
 
-# Part1. Azure Log Analytics and KQL
+<!--
+# Part{{{counter}}}. Azure Log Analytics and KQL
 [Log Analytics のチュートリアル](https://learn.microsoft.com/ja-jp/azure/azure-monitor/logs/log-analytics-tutorial)(日本語版)<br>
 [Log Analytics tutorial](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-tutorial)(英語版)
 ## Intro
@@ -19,34 +20,48 @@
 - KQL
 ### Azure Monitor Overview
 ### KQLと戯れる。
+-->
 
-# Part2. Azure App Service
+# Part1. Azure App Service
 ## Intro
-Code を簡単にdeployできる様をみよう。（開発の部分はやらない。）
+Code を簡単にdeployできる様をみよう。
+いまから、すでにできあがったdjangoのアプリをgit cloneするが、
+意欲のあるひとは、開発の部分に挑戦して、codeをいじくってくれて構わない。
 
-### Select your favorite
-[App Service overview](https://learn.microsoft.com/en-us/azure/app-service/overview)
-- Django
-- Flask
-
-上の中から、好きなweb appのframeworkを選択し、QuickStartのページに飛んでおこう。
-#### 要件
-たとえば、Team1で、djangoを選択したなら
+## 要件
+たとえば、Team1 member2のひとは、下記のようになるようにせよ。
 | Web App name | Resource Group Name | Tag to resource group |
 |--------------|---------------------|-----------------------|
-| Team1-webapp | Team1-webapp-rg     | "framework"="django"  |
+| team1mem2wapp | team1-wapp-rg     | "framework"="django"  |
 
-他の部分は、リンク先のtutorialに従う。
-#### 注意
-**Run the application locally ローカルでアプリを試す**　という項は、python を選ばないとできないはず。飛ばして良い。
+```pwsh
+$wapp="team1mem2wapp"
+$rg="team1-wapp-rg"
+$location="eastasia"
+$tags=@{ "framework"="django"; }
+if ($(Get-AzResourceGroupName -Name $rg 2> $null) -eq $null ) {
+    New-AzResourceGroup -Name $rg -Location $location -Tag $tags
+}
+```
 
+## 手順
+[Quickstart: Deploy a Python (Django or Flask) web app to Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=django)
 
-# Part3. 小問集合
+```pwsh
+git clone https://github.com/Azure-Samples/msdocs-python-django-webapp-quickstart
+```
+
+```pwsh
+az webapp up --runtime PYTHON:3.9 --sku B1 -n $wapp -g $rg --logs
+```
+#### Question 上の2つのコードはなにをしているか？
+
+# Part2. 小問集合
 ## Guidelines
 下記の問題の中には、AZ900の範囲を越えて、クラウドエンジニアとして知っておいてもらいたい知識に関する問題も取り込んでおいた。
 授業で扱っていない内容を扱った問題も存在するが、しっかり考えて、定型業務以外にも対応できる思考力を養ってほしい。
 
-### Question
+### Question1
 
   下記のコマンドを`bash`で実行できるように書き直せ。
   ```pwsh
@@ -55,7 +70,7 @@ Code を簡単にdeployできる様をみよう。（開発の部分はやらな
   PS> | select privateIps, publicIps, fqdns | fl
   ```
 
-### Question
+### Question2
   Azure MarketPlace で利用できるOS imageとして正しいものをすべて選びなさい。
   <table>
   <tr>
@@ -72,7 +87,7 @@ Code を簡単にdeployできる様をみよう。（開発の部分はやらな
   </tr>
   </table>
 
-### Question
+### Question3
 
 下記のコマンドをいれてもうまくloginできない。
 ```pwsh
@@ -83,10 +98,10 @@ PS> ^C
 ```
 何を試すべきか？
 
-### Question
+### Question4
 Azure <span class="hidden">*******</span>を用いれば、vmにpubic ipは必要ない。
 
-### Question
+### Question5
 azure vm をdeployし、下記の設定を入れた。
 ```pwsh
 PS> Invoke-AzVMRunCommand -ResourceGroupName "myResourceGroup" -VMName "myVM" `
@@ -111,7 +126,7 @@ Runniing   ssh-agent       OpenSSH Authentication Agent
 ```
 `.ssh`下にはちゃんと`id_rsa`, `id_rsa.pub`もできている。どんな原因が考えられるだろうか。
 
-### Question
+### Question6
 ```pwsh
 PS C:\Users\dts> systeminfo
 
