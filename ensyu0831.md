@@ -22,41 +22,8 @@
 ### KQLと戯れる。
 -->
 
-# Part1. Azure App Service
-## Intro
-Code を簡単にdeployできる様をみよう。
-いまから、すでにできあがったdjangoのアプリをgit cloneするが、
-意欲のあるひとは、開発の部分に挑戦して、codeをいじくってくれて構わない。
 
-## 要件
-たとえば、Team1 member2のひとは、下記のようになるようにせよ。
-| Web App name | Resource Group Name | Tag to resource group |
-|--------------|---------------------|-----------------------|
-| team1mem2wapp | team1-wapp-rg     | "framework"="django"  |
-
-```pwsh
-$wapp="team1mem2wapp"
-$rg="team1-wapp-rg"
-$location="eastasia"
-$tags=@{ "framework"="django"; }
-if ($(Get-AzResourceGroupName -Name $rg 2> $null) -eq $null ) {
-    New-AzResourceGroup -Name $rg -Location $location -Tag $tags
-}
-```
-
-## 手順
-[Quickstart: Deploy a Python (Django or Flask) web app to Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=django)
-
-```pwsh
-git clone https://github.com/Azure-Samples/msdocs-python-django-webapp-quickstart
-```
-
-```pwsh
-az webapp up --runtime PYTHON:3.9 --sku B1 -n $wapp -g $rg --logs
-```
-#### Question 上の2つのコードはなにをしているか？
-
-# Part2. 小問集合
+# Part1. 小問集合
 ## Guidelines
 下記の問題の中には、AZ900の範囲を越えて、クラウドエンジニアとして知っておいてもらいたい知識に関する問題も取り込んでおいた。
 授業で扱っていない内容を扱った問題も存在するが、しっかり考えて、定型業務以外にも対応できる思考力を養ってほしい。
@@ -181,3 +148,54 @@ Hyper-V Requirements:      A hypervisor has been detected. Features required for
 PS　C:\Users\dts> wsl --install
 ```
 原因として考えられるものはなにか。
+
+# Part2. Azure App Service
+## Intro
+Code を簡単にdeployできる様をみよう。
+いまから、すでにできあがったdjangoのアプリをgit cloneするが、
+意欲のあるひとは、開発の部分に挑戦して、codeをいじくってくれて構わない。
+
+## 要件
+たとえば、Team1 member2のひとは、下記のようになるようにせよ。
+|| Web App  |App Service Plan | Resource Group |
+|-|--------------|--------------|---------------------|
+|name| team1mem2wapp |team1asp| team1-wapp-rg     |
+|tag| "framework"="django"; "team"=1;| "team"=1; | "team"=1;
+```pwsh
+$wapp="team1mem2wapp"
+$asp="team1asp"
+$rg="team1-wapp-rg"
+$location="eastasia"
+$tagswapp=@{"framework"="django"; "team"=1;}
+$tagsasp=@{"team"=1;}
+$tagsrg=@{ "team"=1;}
+if ($(Get-AzResourceGroupName -Name $rg 2> $null) -eq $null ) {
+    New-AzResourceGroup -Name $rg -Location $location -Tag $tagsrg
+}
+```
+
+## 手順
+[Quickstart: Deploy a Python (Django or Flask) web app to Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python?tabs=django)
+
+```pwsh
+git clone https://github.com/Azure-Samples/msdocs-python-django-webapp-quickstart
+```
+#### Question このコードは何をしているか？
+webapp 名やAppServicePlan名を勝手に決められていいなら下記のコマンドをこのまま実行すればよい。
+非常に簡単である！
+
+```pwsh
+az webapp up --runtime PYTHON:3.9 --sku B1 --logs
+```
+しかし、要件に従うためには、下記の手順を踏んだほうがよい。
+
+```pwsh
+New-AzAppServicePlan -ResourceGroupName $rg -Name $asp -Tier "Basic" -NumberofWorkers 2 -WorkerSize "Small"
+New-AzWebApp -Name $wapp -Location $location -AppServicePlan $asp -ResourceGroupName $rg
+$Properties = @{
+  repoUrl = "https://github.com/Azure-Samples/msdocs-python-django-webapp-quickstart";
+  branch = "main";
+  isManualIntegration = "true";
+}
+Set-Resource -Properties $Properties -ResourceGroupName $rg -ResourceType Microsoft.Web/sites/sourcecontrols -ResourceName $wapp/web -ApiVersion 2015-08-01 -Force
+```
